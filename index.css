@@ -1,0 +1,65 @@
+
+#search_form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  margin-top: 5vh;
+}
+
+input:focus {
+  outline: none;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+ul {
+  list-style: none;
+}
+
+#search_input {
+  border: none;
+  border-bottom: solid black 1px;
+  margin: 0 2vw;
+}
+
+#search_btn {
+  background-image: url(./img/search_icon.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  border: none;
+  width: 4vh;
+  height: 4vh;
+}
+
+#search_date {
+  border: none;
+}
+
+.news_li {
+  display: flex;
+  justify-content: space-around;
+  margin: 4vh 0;
+}
+
+.thumbnail_a {
+  display: block;
+  width: 30%;
+}
+
+.news_thumbnail {
+}
+
+.news_thumbnail img {
+  width: 100%;
+}
+
+.title_a {
+  display: block;
+  width: 60%;
+}
