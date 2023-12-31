@@ -55,14 +55,17 @@ function handleForm(event) {
       title_box.className = "title_box"
       li.appendChild(title_box);
       // 뉴스 썸네일
+      let thumbnail = document.createElement('div');
+      thumbnail.className = "news_thumbnail";
+      let thumbnail_img = document.createElement('img');
+      thumbnail_img.className = "thumbnail_img";
+      thumbnail_box.appendChild(thumbnail);
+      thumbnail.appendChild(thumbnail_img);
       if(article.urlToImage !== null) {
-        let thumbnail = document.createElement('div');
-        thumbnail.className = "news_thumbnail";
-        let thumbnail_img = document.createElement('img');
-        thumbnail_img.className = "thumbnail_img";
         thumbnail_img.setAttribute('src', article.urlToImage);
-        thumbnail_box.appendChild(thumbnail);
-        thumbnail.appendChild(thumbnail_img);
+      } else if (article.urlToImage == null) {
+        const imgPath = "./img/no_img.jpg";
+        thumbnail_img.setAttribute('src', imgPath);
       }
       //뉴스 타이틀
       let title = document.createElement('div');
@@ -108,6 +111,27 @@ function modalOpen(event){
   }
 }
 
+
+//무한스크롤
+const observeIntersection = (target, callback) => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        callback();
+      }
+    });
+  });
+  observer.observe(target);
+}
+
+const callNextPage = () =>{
+  let page = 1;
+  return () => {
+    console.log("Loading page", page);
+    page++;
+  }
+} 
+observeIntersection(newsList, callNextPage);
 
 
 modal_close.addEventListener("click", modalClose);
