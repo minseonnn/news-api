@@ -51,7 +51,7 @@ button {
 .news_li {
   display: flex;
   justify-content: space-around;
-  margin: 4vh 0;
+  margin: 4rem 0;
 }
 
 .thumbnail_box {
@@ -59,7 +59,7 @@ button {
   width: 30%;
 }
 
-.news_thumbnail img {
+.thumbnail_box img {
   width: 100%;
   cursor: pointer;
 }
@@ -76,6 +76,10 @@ button {
   cursor: pointer;
 }
 
+body {
+  height: 100%;
+  min-height: 100vh;
+}
 
 .modal_wrap {
   width: 100%;
@@ -84,15 +88,18 @@ button {
   position: absolute;
   top: 0;
   left: 0;
+  bottom: 0;
+  right: 0;
   z-index: 1;
   display: none;
+  position: fixed;
 }
 
 .modal_content {
   width: 30vw;
   height: 25vw;
   background-color: white;
-  margin: 0 auto;
+  margin: 10% auto;
   position: relative;
   overflow: hidden;
 }
@@ -107,7 +114,7 @@ button {
 
 .mNews_title {
   font-weight: 600;
-  font-size: 1.5vw;
+  margin: 0;
   padding: 5% 4%;
 }
 
@@ -119,13 +126,15 @@ button {
 
 .mNews_content {
   font-size: 1.5vw;
-  padding: 10%;
+  padding: 5%;
 }
 
-.goToNews {
+.mNews_view {
   width: 8vw;
   height: 5vh;
+  font-weight: 600;
   line-height: 5vh;
+  text-align: center;
   font-size: 1.5vw;
   background: none;
   font-family: sans-serif;
