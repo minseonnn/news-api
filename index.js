@@ -1,7 +1,10 @@
+
 const searchForm = document.querySelector("#search_form");
 const searchInput = searchForm.querySelector("#search_input");
 const searchDate = searchForm.querySelector("#search_date");
 const searchBtn = searchForm.querySelector("#search_btn");
+
+let keyword;
 
 const newsBox = document.querySelector(".news_box");
 const newsList =document.querySelector(".news_list");
@@ -12,19 +15,22 @@ const modal_wrap = document.querySelector('.modal_wrap');
 let newsDate = new Date().toISOString().substring(0, 10);
 searchDate.value = newsDate;
 
+searchForm.addEventListener("submit", handleForm);
+
 //form의 기본적인 기능을 막는 기능.(submit 기능을 막아야) form 검색 인식하면 이벤트 실행
 function handleForm(event) {
   event.preventDefault();
-  console.log(event);
-
-  let keyword = searchInput.value;
-
+  keyword = searchInput.value;
   if(keyword === "") {
     alert("Enter a search term");
   } else if (keyword.length < 3) {
     alert("Please enter at least 3 characters");
   }
+  console.log(event);
+  printNews(keyword);
+};
 
+function printNews(keyword) {
   const apiKey = "06d0e3a5b3dd44ce9f4b3f011d79c3e2";
   const url = `https://newsapi.org/v2/everything?q=${keyword}&to=${newsDate}&sortBy=popularity&apiKey=${apiKey}`;
 
@@ -34,21 +40,21 @@ function handleForm(event) {
     return response.json()
   })
   .then((data) => {
-    console.log(data.articles);
-    newsList.innerHTML = '';
+    // console.log(data.articles);
+    newsList.innerHTML += '';
     // console.log(article_list);
-    
-    const arrA = data.articles.map(article => {
+    const newsArray = data.articles.map(article => {
     const li = createListElement(article);
     li.addEventListener('click', () => createModal(article))
     return li
-    });
-    console.log(arrA);
-    arrA.forEach(element => newsList.appendChild(element));
-  }
-  ).catch(error => console.error(error.message));
-;
-};
+    })
+    newsArray.forEach(element => newsList.appendChild(element));
+    return newsArray
+  }).then(newsArray => {
+    console.log(newsArray);
+    observerItem(observer, newsArray);
+  }).catch(error => console.error(error.message));
+}
 
 function createListElement (article) {
   // ul 안에 그려 줄 new item 
@@ -107,7 +113,6 @@ function createModal (article) {
   modal_content.appendChild(mNews_author);
   modal_content.appendChild(mNews_content);
   modal_content.appendChild(mNews_view);
-  
 }
 
 // {className, onClick, src, innerText}
@@ -116,7 +121,6 @@ function createElement(elementTag, className) {
   element.classList.add(className)
   return element
 }
-
 
 function modalClose(event) {
   let modal_content = document.querySelector(".modal_content");
@@ -132,27 +136,22 @@ function modalOpen(event){
   }
 }
 
+//intersection observer
+const observer =  new IntersectionObserver(callback,{
+  threshold: 0.5});
 
-//무한스크롤
-const observeIntersection = (target, callback) => {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        callback();
-      }
-    });
-  });
-  observer.observe(target);
+function callback(entries, observer) {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      console.log("뷰포트가 뉴스리스트의 50%까지 교차 되었음");
+      printNews(keyword);
+    }
+  })
 }
 
-const callNextPage = () =>{
-  let page = 1;
-  return () => {
-    console.log("Loading page", page);
-    page++;
-  }
-} 
-observeIntersection(newsList, callNextPage);
-
-searchForm.addEventListener("submit", handleForm);
+function observerItem(observe, newsItem) {
+  console.log(newsItem.length);
+  const lastItem = newsItem[newsItem.length - Number(newsItem.length/2)];
+  observe.observe(lastItem);
+}
 
