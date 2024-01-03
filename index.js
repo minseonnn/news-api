@@ -27,6 +27,7 @@ function handleForm(event) {
     alert("Please enter at least 3 characters");
   }
   console.log(event);
+  newsList.innerHTML = ''; 
   printNews(keyword);
 };
 
@@ -41,7 +42,7 @@ function printNews(keyword) {
   })
   .then((data) => {
     // console.log(data.articles);
-    newsList.innerHTML += '';
+
     // console.log(article_list);
     const newsArray = data.articles.map(article => {
     const li = createListElement(article);
@@ -52,7 +53,7 @@ function printNews(keyword) {
     return newsArray
   }).then(newsArray => {
     console.log(newsArray);
-    observerItem(observer, newsArray);
+    observerItem(observer, newsArray,event);
   }).catch(error => console.error(error.message));
 }
 
@@ -144,6 +145,7 @@ function callback(entries, observer) {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       console.log("뷰포트가 뉴스리스트의 50%까지 교차 되었음");
+      newsList.innerHTML += ''; 
       printNews(keyword);
     }
   })
