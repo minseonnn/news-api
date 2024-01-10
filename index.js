@@ -5,6 +5,7 @@ const searchDate = searchForm.querySelector("#search_date");
 const searchBtn = searchForm.querySelector("#search_btn");
 
 let keyword;
+let page = 1;
 
 const newsBox = document.querySelector(".news_box");
 const newsList =document.querySelector(".news_list");
@@ -28,12 +29,13 @@ function handleForm(event) {
   }
   console.log(event);
   newsList.innerHTML = ''; 
+  page = 1;
   printNews(keyword);
 };
 
 function printNews(keyword) {
   const apiKey = "06d0e3a5b3dd44ce9f4b3f011d79c3e2";
-  const url = `https://newsapi.org/v2/everything?q=${keyword}&to=${newsDate}&sortBy=popularity&apiKey=${apiKey}`;
+  const url = `https://newsapi.org/v2/everything?q=${keyword}&to=${newsDate}&pageSize=5&page=${page}&sortBy=popularity&apiKey=${apiKey}`;
 
   fetch(url)
   .then((response) => {
@@ -41,32 +43,34 @@ function printNews(keyword) {
     return response.json()
   })
   .then((data) => {
-    // console.log(data.articles);
+    console.log(data.articles);
 
     // console.log(article_list);
     const newsArray = data.articles.map(article => {
+      console.log(article);
     const li = createListElement(article);
     li.addEventListener('click', () => createModal(article))
     return li
     })
+    console.log(newsArray);
     newsArray.forEach(element => newsList.appendChild(element));
     return newsArray
   }).then(newsArray => {
     console.log(newsArray);
-    observerItem(observer, newsArray,event);
+    observerItem(observer, newsArray);
   }).catch(error => console.error(error.message));
 }
 
 function createListElement (article) {
   // ul 안에 그려 줄 new item 
-  let li = createElement("li", "news_li");
+  let li = createElement("li", {class:"news_li"});
   
   //기사 이미지 링크
-  let thumbnail_box = createElement('div','thumbnail_box');
+  let thumbnail_box = createElement('div',{class:'thumbnail_box'});
   thumbnail_box.addEventListener("click", modalOpen);
   li.appendChild(thumbnail_box);
   
-  let thumbnail_img = createElement('img','thumbnail_img');
+  let thumbnail_img = createElement('img',{class:'thumbnail_img'});
   if (article.urlToImage !== null) {
     thumbnail_img.setAttribute('src', article.urlToImage);
   } else if (article.urlToImage == null) {
@@ -76,10 +80,10 @@ function createListElement (article) {
   thumbnail_box.appendChild(thumbnail_img);
   
   //기사 제목 링크
-  let title_box = createElement('div','title_box');
+  let title_box = createElement('div',{class:'title_box'});
   li.appendChild(title_box);
   //뉴스 타이틀
-  let title = createElement('h2', "news_title");
+  let title = createElement('h2', {class:"news_title"});
   title.innerText = article.title;
   title_box.appendChild(title)
   title.addEventListener("click", modalOpen);
@@ -94,19 +98,18 @@ function createListElement (article) {
 
 function createModal (article) {
 //모달창 
-  let modal_content = createElement('div','modal_content');
-  let mNews_title = createElement('h3','mNews_title');
-  mNews_title.innerText = article.title;
-  let mNews_author = createElement('p','mNews_author');
-  mNews_author.innerText = article.author;
-  let mNews_content = createElement('p','mNews_content');
-  mNews_content.innerText = article.description.slice(0,100) + "...";
-  let mNews_view = createElement('a','mNews_view');
-  mNews_view.href = article.url
-  mNews_view.innerText = 'view';
-  let modal_close = createElement('button','modal_close');
-  modal_close.innerText = 'X';
-  modal_close.addEventListener("click", modalClose);
+  let modal_content = createElement('div',{class:'modal_content',});
+  let mNews_title = createElement('h3',{class:'mNews_title', children: article.title});
+
+  let mNews_author = createElement('p',{class:'mNews_author', children : article.author});
+
+  let mNews_content = createElement('p',{class:'mNews_content', children :article.description.slice(0,100) + "..."});
+  
+  let mNews_view = createElement('a',{class:'mNews_view' ,href : article.url, children : 'view'});
+  
+  let modal_close = createElement('button',{class:'modal_close', children : "X"});
+
+  modal_close.addEventListener("click", modalClose)
 
   modal_wrap.appendChild(modal_content);
   modal_content.appendChild(modal_close);
@@ -117,13 +120,22 @@ function createModal (article) {
 }
 
 // {className, onClick, src, innerText}
-function createElement(elementTag, className) {
+function createElement(elementTag, attributes) {
   const element = document.createElement(elementTag);
-  element.classList.add(className)
+  const {children, ...rest} = attributes ?? {}
+  
+  Object.entries(rest ?? {}).forEach(([key, value]) => {
+    element.setAttribute(key, value);
+  })
+
+  if(children) {
+    element.innerHTML = children;
+  }
   return element
 }
 
 function modalClose(event) {
+  console.log(event);
   let modal_content = document.querySelector(".modal_content");
   if(event.target.className === "modal_close"){
   modal_wrap.removeChild(modal_content);
@@ -138,22 +150,23 @@ function modalOpen(event){
 }
 
 //intersection observer
-const observer =  new IntersectionObserver(callback,{
-  threshold: 0.5});
+const observer =  new IntersectionObserver(callback, {threshold: 0.5});
+console.log(observer);
 
 function callback(entries, observer) {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       console.log("뷰포트가 뉴스리스트의 50%까지 교차 되었음");
-      newsList.innerHTML += ''; 
       printNews(keyword);
+      observer.disconnect();
     }
   })
 }
 
-function observerItem(observe, newsItem) {
-  console.log(newsItem.length);
-  const lastItem = newsItem[newsItem.length - Number(newsItem.length/2)];
+function observerItem(observe, newsArray) {
+  console.log(newsArray.length);
+  const lastItem = newsArray[Math.ceil(newsArray.length - Number(newsArray.length/2))];
   observe.observe(lastItem);
+  page++;
 }
 

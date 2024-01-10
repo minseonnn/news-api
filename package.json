@@ -1,0 +1,14 @@
+{
+  "name": "new-api",
+  "version": "1.0.0",
+  "description": "news-api with js&ts",
+  "main": "index.js",
+  "scripts": {
+    "compile": "./node_modules/.bin/tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "typescript": "^5.3.3"
+  }
+}
